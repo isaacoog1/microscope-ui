@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microscope Size Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: #55061C;
+            box-sizing: border-box;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            padding: 2rem;
+            max-width: 400px;
+            padding-top: 1rem;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #101828;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            border: none;
+            color: white;
+            cursor: pointer;
+            background: #a53886;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        input:focus {
+            outline: #55061C;
+        }
+
+        .result {
+            font-size: 20px;
+            color: green;
+            margin-top: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Microscope Size Calculator</h2>
+        <form id="microscope-form">
+            <input type="text" id="username" placeholder="Enter your name" required />
+            <input type="number" step="0.01" min="0" id="microscopeSize" placeholder="Microscope size (mm)" required />
+            <input type="number" step="0.01" min="0" id="magnification" placeholder="Magnification" required />
+            <button type="submit">Calculate</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('microscope-form');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const microscopeSize = parseFloat(document.getElementById('microscopeSize').value);
+            const magnification = parseFloat(document.getElementById('magnification').value);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, microscope_size: Number(microscopeSize), magnification: Number(magnification) }),
+                });
+
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    resultDiv.textContent = `Actual size: ${data.actual_size} mm`;
+                } else {
+                    resultDiv.textContent = 'An error occurred. Please try again.';
+                    resultDiv.style.color = 'red';
+                }
+            } catch (error) {
+                console.log(error)
+                resultDiv.style.color = 'red';
+                resultDiv.textContent = 'An error occurred. Please try again.';
+            }
+        });
+    </script>
+</body>
+
+</html>
